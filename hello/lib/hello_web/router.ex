@@ -17,10 +17,12 @@ defmodule HelloWeb.Router do
 
   scope "/", HelloWeb do
     pipe_through :browser
-
+ 
     get "/", PageController, :index
     get "/hello", HelloController, :index
     get "/hello/:messenger", HelloController, :show
+    #resources "/posts", PostController, only: [:index, :show]
+    #resources "/comments", CommentController, except: [:delete]
   end
 
   # Other scopes may use custom stacks.

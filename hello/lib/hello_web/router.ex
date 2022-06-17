@@ -2,13 +2,12 @@ defmodule HelloWeb.Router do
   use HelloWeb, :router
 
   pipeline :browser do
-    plug :accepts, ["html"]
+    plug :accepts, ["html", "text"]
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, {HelloWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug HelloWeb.Plugs.Locale, "en"
   end
 
   pipeline :api do
@@ -17,14 +16,37 @@ defmodule HelloWeb.Router do
 
   scope "/", HelloWeb do
     pipe_through :browser
+
+    resources "/reviews", ReviewController
  
     get "/", PageController, :index
+    get "/redirect_test", PageController, :redirect_test
+    resources "/users", UserController do
+        resources "/posts", PostController
+    end
     get "/hello", HelloController, :index
     get "/hello/:messenger", HelloController, :show
+
+    
     #resources "/posts", PostController, only: [:index, :show]
     #resources "/comments", CommentController, except: [:delete]
   end
 
+  scope "/admin", HelloWeb.Admin, as: :admin do
+      pipe_through :browser
+
+      resources "/reviews", ReviewController
+  end
+
+  scope "/api", HelloWeb.Api, as: :api do
+    pipe_through :api
+    
+    scope "/v1", V1, as: :v1 do
+        resources "/images", ImageController
+        resources "/reviews", ReviewController
+        resources "/users", UserController
+    end
+  end
   # Other scopes may use custom stacks.
   # scope "/api", HelloWeb do
   #   pipe_through :api
